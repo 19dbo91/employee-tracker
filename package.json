@@ -1,0 +1,25 @@
+{
+  "name": "challenge12_organization_cms",
+  "version": "1.0.0",
+  "description": "inplace standin for real readme",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/19dbo91/organization-CMS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/19dbo91/organization-CMS/issues"
+  },
+  "homepage": "https://github.com/19dbo91/organization-CMS#readme",
+  "dependencies": {
+    "inquirer": "^8.2.4",
+    "mysql2": "^3.4.2"
+  }
+}
