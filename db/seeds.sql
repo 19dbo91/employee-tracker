@@ -3,7 +3,7 @@ VALUE
     ("Administration"),
     ("Human Resources"),
     ("Security"),
-    ("Project Management Office")
+    ("Project Management Office"),
     ("Information Technology");
 
 
@@ -20,10 +20,15 @@ VALUE -- Salaries, mean (ZIPPIA.com as of 2023/06/28)
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
 VALUE
-    ("Dustin", "Vanilla", 5 , 2),
     ("Steven", "Shwimmer", 1 , NULL),
-    ("Daniel", "Radcliffe", 4, 4),
-    ("Marinah", "Bay", 7, 2),
+    ("Dustin", "Vanilla", 5 , 1),
+    ("Daniel", "Radcliffe", 4, 1),
+    ("Marinah", "Bay", 7, 1),
     ("John", "Cena", 7, 4),
-    ("Baby", "Yoda", 6, ),
-    ("Baby", "Groot",2, 2);
+    ("Baby", "Yoda", 6, 4),
+    ("Baby", "Groot", 2, 2);
+
+
+SELECT * FROM departments;
+SELECT * FROM roles;
+SELECT * FROM employees;
