@@ -75,11 +75,12 @@
 */
 
 
-//#region Dependencies
-const inquirer = requirer('inquirer');
+//#region Dependencies and Statics
+const inquirer = require('inquirer');
 const mysql = require('mysql2');
-//#endregion
+const PORT = process.env.PORT || 3001;
 
+require('dotenv').config();
 const db = mysql.createConnection(
     {
       host: 'localhost',
@@ -87,5 +88,13 @@ const db = mysql.createConnection(
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME
     },
-    console.log(`Connected to the classlist_db database.`)
-  );
+    console.log(`Connected to the org_db database.`)
+);
+
+//#endregion
+
+//#region 
+//class Prompt(){}
+
+const set1=[];
+//#endregion

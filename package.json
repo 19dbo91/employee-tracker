@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/19dbo91/organization-CMS#readme",
   "dependencies": {
+    "dotenv": "^16.3.1",
     "inquirer": "^8.2.4",
     "mysql2": "^3.4.2"
   }
