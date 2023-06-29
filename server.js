@@ -3,10 +3,10 @@
     SO THAT I can organize and plan my business
 */
 
-/* ACCEPTANCE CRITERIA //TODO:(8)
+/* ACCEPTANCE CRITERIA //TODO:(7)
     (CMD-line app <- USER_INPUT)
 
-@ STARTED app
+// @ STARTED app
     > PRESENT 
         view all departments
         view all roles
@@ -76,7 +76,8 @@
 
 
 //#region Dependencies and Statics
-const inquirer = require('inquirer');
+const {Question, MultiChoice, ShortAnswer} = require('./js/questions.js');
+const {prompt} = require('inquirer');
 const mysql = require('mysql2');
 const PORT = process.env.PORT || 3001;
 
@@ -93,8 +94,74 @@ const db = mysql.createConnection(
 
 //#endregion
 
-//#region 
-//class Prompt(){}
+//#region Inquirer
 
-const set1=[];
+const mainMenuOptions = [
+    "View All Departments",
+    "Add Department",
+    "View All Roles",        
+    "Add Role",
+    "View All Employees",
+    "Add Employee",
+    "Update an Employee Role",
+    "Quit"
+]
+
+const promptsMainMenu = [
+    new MultiChoice("nextMenu", "What would you like to do?", mainMenuOptions)
+];
+
+const promptsNewDepartment = [
+    new ShortAnswer("department","What is the name of the NEW department?")
+];
+
+const promptsNewRole = [
+    new ShortAnswer("role","What is the name of the NEW role?"),
+    //salary (number)
+    //department (list)
+];
+ 
+
+const promptsNewEmployee = [
+    new ShortAnswer("name","What is your name")
+    //last name
+    //role (choice)
+    //manager+(none==null)
+];
+
+
+
+const runMainMenu = async () => {
+    const userResponse = await prompt(promptsMainMenu)
+    console.log(`You chose ${userResponse.nextMenu}!`);
+    
+    switch(userResponse.nextMenu){
+        case "View All Departments":
+            //console.log("Show all departments");
+            showAll("departments");
+            break;
+        case 'quit':
+        default:
+            console.log("Thank you! We hope to see you soon :)");
+            process.exit(0);
+    }
+}
+
+
+const showAll = (table) => {
+    console.log("Checking table: "+table)
+    const sql = "SELECT * FROM ?";
+    db.query(sql, table, function (err, results){
+        try{console.log(results);  }
+        catch{ throw err; }
+        finally{
+            console.log(`\n`);
+            runMainMenu();
+        }
+    });    
+}
+
+
+runMainMenu();
+
 //#endregion
