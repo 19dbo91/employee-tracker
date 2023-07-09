@@ -1,19 +1,19 @@
 class Question {
-    constructor(typeString, nameString, msgString){
-        this.type = typeString;
+    constructor(nameString, typeString, msgString){
         this.name = nameString;
+        this.type = typeString;
         this.message = msgString;
     }
 }
 class MultiChoice extends Question {
     constructor(nameString, msgString, choicesArr){
-        super("list", nameString, msgString);
+        super(nameString, "list", msgString);
         this.choices = choicesArr;
     }
 }
 class ShortAnswer extends Question {
     constructor(nameString, msgString){
-        super("input", nameString, msgString);
+        super(nameString, "input", msgString);
     }
 }
 

@@ -3,7 +3,7 @@
     SO THAT I can organize and plan my business
 */
 
-/* ACCEPTANCE CRITERIA //TODO:(7)
+/* ACCEPTANCE CRITERIA //TODO:(4)
     (CMD-line app <- USER_INPUT)
 
 // @ STARTED app
@@ -16,12 +16,12 @@
         add an employee
         update an employee role
 
-@ CHOSE view all departments
-    > PRESENT with a formatted table
+// @ CHOSE view all departments
+    > PRESENT with a formatted table\
         department name
         department ID
 
-@ CHOSE view all roles
+//@ CHOSE view all roles
     > PRESENT:
         job title
         role id
@@ -29,7 +29,7 @@
         salary of that role
 
 
-@ CHOSE view all employees
+//@ CHOSE view all employees
     > PRESENT with a formatted table
         employee ids
         first names
@@ -81,11 +81,9 @@ const {prompt} = require('inquirer');
 const mysql = require('mysql2');
 const PORT = process.env.PORT || 3001;
 const db = require('./config/connection');
-
-
 //#endregion
 
-//#region Inquirer
+//#region Main Menu
 
 const mainMenuOptions = [
     "View All Departments",
@@ -101,25 +99,63 @@ const mainMenuOptions = [
 const promptsMainMenu = [
     new MultiChoice("nextMenu", "What would you like to do?", mainMenuOptions)
 ];
+//#endregion
 
-const promptsNewDepartment = [
-    new ShortAnswer("department","What is the name of the NEW department?")
+
+//#region Query Handlers and Prompts
+const Departments = {
+    prompts: [new ShortAnswer("department", "What is the name of the department?")],
+    selectQuery: function() { return "SELECT * FROM departments"},
+    insertQuery: function(nameString) { return `INSERT INTO departments (name) VALUE (${nameString})`},
+    deleteQuery: function(nameString) { return `DELETE FROM departments WHERE name = ${nameString}`}
+}
+
+const Roles = {
+    prompts: [new ShortAnswer("department", "What is the name of the NEW department?")],
+    
+    selectColumn:   "roles.id, roles.title, departments.name AS department, roles.salary",
+    selectJoin:     "JOIN departments ON roles.department_id = departments.id",
+    selectQuery:    function() { return `SELECT ${this.selectColumn} FROM roles ${this.selectJoin}`},
+    
+    insertColumn:   "title, salary, department_id",
+    insertQuery:    function(titleString, salary, department_id) { return `INSERT INTO roles (${this.insertColumn}) VALUE (${titleString}, ${salary}, ${department_id}})`},
+
+    deleteQuery:    function(titleString) {return `DELETE FROM roles WHERE title= ${titleString}`}
+}
+
+const Employees = {
+    prompts: [new ShortAnswer("department", "What is the name of the NEW department?")],
+    
+    selectColumn:   "E.id, E.first_name, E.last_name, roles.title, departments.name AS department, roles.salary, CONCAT(managers.first_name, ' ', managers.last_name) AS manager",
+    joinRoles:      "JOIN roles ON E.role_id = roles.id", 
+    joinDepts:      "JOIN departments ON roles.department_id = departments.id",
+    joinManagers:   "LEFT JOIN employees AS managers ON E.manager_id = managers.id",
+    selectJoin:     function() {return `${this.joinRoles} ${this.joinDepts} ${this.joinManagers}`},
+    selectQuery:    function() { return `SELECT ${this.selectColumn} FROM employees AS E ${this.selectJoin()}`},
+    
+    insertColumn:   "title, salary, department_id",
+    insertQuery:    function(titleString, salary, department_id) { return `INSERT INTO roles (${this.insertColumn}) VALUE (${titleString}, ${salary}, ${department_id}})`},
+
+    deleteQuery:    function(titleString) {return `DELETE FROM roles WHERE title= ${titleString}`}
+}
+
+
+//#endregion
+
+let promptsNewRole = [
+    new ShortAnswer("role", "What is the name of the NEW role?"),
+    new Question("salary", "number", "What would be its salary?"),
+    new MultiChoice("department", "What department would it belong to?", [])
 ];
 
-const promptsNewRole = [
-    new ShortAnswer("role","What is the name of the NEW role?"),
-    //salary (number)
-    //department (list)
-];
- 
+
 
 const promptsNewEmployee = [
-    new ShortAnswer("name","What is your name")
-    //last name
+    new ShortAnswer("firstName", "What is the NEW employee's first name?"),
+    new ShortAnswer("lastName", "What is the last name?")
     //role (choice)
-    //manager+(none==null)
+    //manager(list) OR (none==null)
 ];
-
 
 
 const getMainMenu = async () => {
@@ -128,11 +164,26 @@ const getMainMenu = async () => {
     
     switch(userResponse.nextMenu){
         case "View All Departments":
-            view("departments"); break;
+            viewAll(Departments.selectQuery()); break;
         case "View All Roles":
-            view("roles"); break;
+            viewAll(Roles.selectQuery()); break;
         case "View All Employees":
-            view("employees"); break;
+            viewAll(Employees.selectQuery()); break;
+
+        case "Add Department":
+            const newDepartment = await prompt(Departments.prompts);
+            console.log(newDepartment);
+            //!Null:
+                //sanitize(newDepartment)
+            //!isDupe:
+                //add//parse params in add 
+                //update views
+            //view
+            //get main menu
+            break;
+        case "Add Role":
+            getNewRole();
+            break;
         case 'quit':
         default:
             console.log("Thank you! We hope to see you soon :)");
@@ -140,15 +191,44 @@ const getMainMenu = async () => {
     }
 }
 
-
-const view = async (table)=>{
-    db.query(`SELECT * FROM ${table}`, (err,result)=>{
+////DONE
+const viewAll = (query)=>{
+    console.log(`Querying...${query}`)
+    db.query(query, (err,result)=>{
         console.table(result);
         getMainMenu();
     });
 }
 
+const isDuplicate = (table, value) => {
+    //value null skip
+  
+   // [...objects]
+   // let sql = getSelect(table)
+   // let foundDuplicate = false;
+  
+   //db.query(sql, (err,result)=>{
+       //iter thru obj
+       //return true or not })
+   
+};
+
+
+const addTo = (table, value) => {
+   let sql = getInsert(table);
+   console.log(sql);
+   
+   /*sample: INSERT INTO departments (name) VALUE ("Data Governance"); */
+   //db.query(`INSERT INTO ${} VALUE `, )
+}
+
+//add:
+
+//get new
+// check if null
+//sanitizeString: (trimmed and setlower then capitalize 0index remove symbols
+// check if exists already
+
 
 getMainMenu();
 
-//#endregion
