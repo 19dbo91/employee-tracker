@@ -80,17 +80,8 @@ const {Question, MultiChoice, ShortAnswer} = require('./js/questions.js');
 const {prompt} = require('inquirer');
 const mysql = require('mysql2');
 const PORT = process.env.PORT || 3001;
+const db = require('./config/connection');
 
-require('dotenv').config();
-const db = mysql.createConnection(
-    {
-      host: 'localhost',
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME
-    },
-    console.log(`Connected to the org_db database.`)
-);
 
 //#endregion
 
@@ -131,15 +122,17 @@ const promptsNewEmployee = [
 
 
 
-const runMainMenu = async () => {
-    const userResponse = await prompt(promptsMainMenu)
+const getMainMenu = async () => {
+    const userResponse = await prompt(promptsMainMenu);
     console.log(`You chose ${userResponse.nextMenu}!`);
     
     switch(userResponse.nextMenu){
         case "View All Departments":
-            //console.log("Show all departments");
-            showAll("departments");
-            break;
+            view("departments"); break;
+        case "View All Roles":
+            view("roles"); break;
+        case "View All Employees":
+            view("employees"); break;
         case 'quit':
         default:
             console.log("Thank you! We hope to see you soon :)");
@@ -148,20 +141,14 @@ const runMainMenu = async () => {
 }
 
 
-const showAll = (table) => {
-    console.log("Checking table: "+table)
-    const sql = "SELECT * FROM ?";
-    db.query(sql, table, function (err, results){
-        try{console.log(results);  }
-        catch{ throw err; }
-        finally{
-            console.log(`\n`);
-            runMainMenu();
-        }
-    });    
+const view = async (table)=>{
+    db.query(`SELECT * FROM ${table}`, (err,result)=>{
+        console.table(result);
+        getMainMenu();
+    });
 }
 
 
-runMainMenu();
+getMainMenu();
 
 //#endregion

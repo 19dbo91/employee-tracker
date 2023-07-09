@@ -1,3 +1,5 @@
+USE org_db;
+
 INSERT INTO departments (name)
 VALUE
     ("Administration"),
@@ -24,9 +26,9 @@ VALUE
     ("Dustin", "Vanilla", 5 , 1),
     ("Daniel", "Radcliffe", 4, 1),
     ("Marinah", "Bay", 7, 1),
-    ("John", "Cena", 7, 4),
+    ("Johnathan", "PasCena", 7, 4),
     ("Baby", "Yoda", 6, 4),
-    ("Baby", "Groot", 2, 2);
+    ("Kebert", "Xela", 2, 2);
 
 
 SELECT * FROM departments;
