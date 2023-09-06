@@ -13,6 +13,8 @@ const optionsMainMenu = [
     "View All Roles",        
     "Add Role",
     "View All Employees",
+    "View Employees by Manager",
+    "View Employees by Department",
     "Add Employee",
     "Update an Employee Role",
     "Update an Employee Manager",
@@ -32,6 +34,8 @@ const getMainMenu = async () => {
         case "View All Departments":    view(Department.all); break;
         case "View All Roles":          view(Role.all); break;
         case "View All Employees":      view(Employee.all); break;
+        case "View Employees by Manager":   viewEmployeeByManager(); break;
+        case "View Employees by Department":viewEmployeeByDepartment(); break;
         case "Add Department":          addDepartment();break;
         case "Add Role":                addRole();break;
         case "Add Employee":            addEmployee();break;
@@ -53,6 +57,7 @@ const promisifyQuery = (query) =>{
     })
 }//Credit:cgpt-assist
 
+//#region View Section
 const view = (sqlQuery)=> {
     console.log(`Querying...${sqlQuery}`);
     db.query(sqlQuery, (err,result)=>{
@@ -61,6 +66,61 @@ const view = (sqlQuery)=> {
     });
 };
 
+const viewEmployeeByManager = async()=>{
+    const [employees] = await Promise.all([
+        promisifyQuery(Employee.selectFullName),
+    ]);
+
+    const chooseEmployee = employees.map( (employee) => employee.fullName );
+    console.log(chooseEmployee);
+
+    const responseView = await prompt([
+        new MultiChoice( 'manager', Employee.promptsEmployee, chooseEmployee), //note: id needed, string recieved  as displayed
+    ]);
+
+    const { manager } = responseView;
+    const managerId = chooseEmployee.indexOf(manager)+1; //offbyOne dueTo indexVS ID
+    console.log(managerId);
+
+
+    const sqlView = Employee.queryByManager(managerId);
+    console.log(`Querying...${sqlView}`);
+    db.query(sqlView, (err,result)=>{
+        console.table(result);
+        getMainMenu();
+    });
+}
+
+const viewEmployeeByDepartment = async() => {
+    const [departments] = await Promise.all([
+        promisifyQuery(Department.selectName),
+    ]);
+
+    const chooseDepartment = departments.map( (dept) => dept.name );
+    console.log(chooseDepartment);
+
+    const responseView = await prompt([
+        new MultiChoice( 'department', Department.promptsName, chooseDepartment), //note: id needed, string recieved  as displayed
+    ]);
+
+    const { department } = responseView;
+
+    const departmentId = chooseDepartment.indexOf(department)+1; //offbyOne dueTo indexVS ID
+    console.log(departmentId);
+
+
+    const sqlView = Employee.queryByDepartment(departmentId);
+    console.log(`Querying...${sqlView}`);
+    db.query(sqlView, (err,result)=>{
+        console.table(result);
+        getMainMenu();
+    });
+}
+
+
+//#endregion
+
+//#region Add Section
 const addDepartment = async () => {
     const responseAdd = await prompt([
         new ShortAnswer( 'name', Department.promptsName )
@@ -131,8 +191,9 @@ const addRole = async()=>{
         }
     );
 }
+//#endregion
 
-
+//#region Update Section
 const updateEmployeeRole = async() => {
     const [roles, employees] = await Promise.all([
         promisifyQuery(Role.selectTitle),
@@ -191,27 +252,7 @@ const updateEmployeeManager = async() => {
         getMainMenu();
     });
 }
-
-const update = async (field)=>{
-    let responseUpdate, sqlUpdate;
-    switch(field){
-        case 'department':
-            break;
-        case 'employee':
-            break;
-        case 'role':
-            break;
-        default:
-            console.error("Invalid field, returning to main menu");
-            getMainMenu();
-    }
-    console.log(responseUpdate);
-    console.log(`Querying...${sqlUpdate}`);
-    db.query(sqlUpdate, (err,result)=>{
-        console.table(result);
-        getMainMenu();
-    });
-}
+//#endregion
 
 const remove = async (field)=>{
     let responseRemove, sqlDelete;
