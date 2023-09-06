@@ -1,4 +1,4 @@
-# Employee Tacker
+# Employee Tracker
 
 ![MIT License](https://img.shields.io/badge/license-MIT%20License-green)
 
@@ -8,7 +8,7 @@ The objective of this project is to create the CMS for an organization to manage
 
 ## Table of Contents
 
-- [Employee Tacker](#employee-tacker)
+- [Employee Tracker](#employee-tracker)
   - [Description](#description)
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
@@ -19,7 +19,7 @@ The objective of this project is to create the CMS for an organization to manage
 ## Installation
 
 Install the apprpriate version of SQL.
-Download from [this repo]()
+Download from [this repo](https://github.com/19dbo91/employee-tracker)
 In the folder you stored it in, run 
 ``npm install``
 This should have pulled down the following dependencies and version:
@@ -42,6 +42,7 @@ In mysql shell,
 - Start with ``npm start``
 - Follow the prompts as desired
 
+- Check out this [demo video](still working on it)
 
 ## License
 
