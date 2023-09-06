@@ -15,6 +15,7 @@ const optionsMainMenu = [
     "View All Employees",
     "Add Employee",
     "Update an Employee Role",
+    "Update an Employee Manager",
     "Quit"
 ]
 
@@ -34,12 +35,23 @@ const getMainMenu = async () => {
         case "Add Department":          addDepartment();break;
         case "Add Role":                addRole();break;
         case "Add Employee":            addEmployee();break;
+        case "Update an Employee Role":    updateEmployeeRole();break;
+        case "Update an Employee Manager": updateEmployeeManager();break;
         case 'quit':
         default:
             console.log("Thank you! We hope to see you soon :)");
             process.exit(0);
     }
 }
+
+const promisifyQuery = (query) =>{
+    return new Promise((resolve,reject) => {
+        db.query(query, (err,result) => { err
+            ? reject(err)
+            : resolve(result)
+        })
+    })
+}//Credit:cgpt-assist
 
 const view = (sqlQuery)=> {
     console.log(`Querying...${sqlQuery}`);
@@ -48,7 +60,6 @@ const view = (sqlQuery)=> {
         getMainMenu();
     });
 };
-
 
 const addDepartment = async () => {
     const responseAdd = await prompt([
@@ -63,20 +74,10 @@ const addDepartment = async () => {
     });
 }
 
-
-const promisifyQuery = (query) =>{
-    return new Promise((resolve,reject) => {
-        db.query(query, (err,result) => { err
-            ? reject(err)
-            : resolve(result)
-        })
-    })
-}//cgpt-assist
-
 const addEmployee = async ()=>{
     const [roles, otherEmployees] = await Promise.all([
         promisifyQuery(Role.selectTitle),
-        promisifyQuery(Employee.selectManager),
+        promisifyQuery(Employee.selectFullName),
     ]);
 
     const chooseRole = roles.map( (role) => role.title );
@@ -86,7 +87,7 @@ const addEmployee = async ()=>{
     const responseAdd = await prompt([
         new ShortAnswer( 'firstName', Employee.promptsFirst ),
         new ShortAnswer( 'lastName', Employee.promptsLast ),
-        new MultiChoice( 'role', Employee.promptsSalary, chooseRole), //note: id needed, string recieved as displayed
+        new MultiChoice( 'role', Role.promptsTitle, chooseRole), //note: id needed, string recieved as displayed
         new MultiChoice( 'manager', Employee.promptsDepartment, chooseManger) //note: id needed, string recieved  as displayed
     ]);
 
@@ -102,7 +103,6 @@ const addEmployee = async ()=>{
     });
 };
 
-
 const addRole = async()=>{
     db.query( "SELECT * from departments", 
         async (err,result) => { //console.table(result);
@@ -114,7 +114,7 @@ const addRole = async()=>{
             ]);
             
             const { title, salary } = responseAdd;
-            const departmentId = updatedList.indexOf(responseAdd.department)
+            const departmentId = updatedList.indexOf(responseAdd.department)+1
             if(!title || !salary){
                 console.error("Error in title or salary; please try again")
                 console.log(`\n`)
@@ -133,6 +133,47 @@ const addRole = async()=>{
 }
 
 
+const updateEmployeeRole = async() => {
+    const [roles, employees] = await Promise.all([
+        promisifyQuery(Role.selectTitle),
+        promisifyQuery(Employee.selectFullName),
+    ]);
+
+    const chooseRole = roles.map( (role) => role.title );
+    const chooseEmployee = employees.map( (employee) => employee.fullName );
+    console.log(chooseRole, chooseEmployee);
+
+    const responseUpdate = await prompt([
+        new MultiChoice( 'employee', Employee.promptsChangeRole, chooseEmployee), //note: id needed, string recieved  as displayed
+        new MultiChoice( 'role', Role.promptsTitle, chooseRole) //note: id needed, string recieved as displayed
+    ]);
+
+    const { role, employee } = responseUpdate;
+
+    const roleId = chooseRole.indexOf(role)+1;
+    const employeeId = chooseEmployee.indexOf(employee)+1;
+
+    console.log(employeeId, roleId );
+
+
+    const sqlUpdate = Employee.queryUpRole(employeeId, roleId);
+    console.log(`Querying...${sqlUpdate}`);
+    db.query(sqlUpdate, (err,result)=>{
+        console.table(result);
+        getMainMenu();
+    });
+}
+// const updateEmployeeManager = async() => {
+//     let responseUpdate;
+//     console.log(responseUpdate);
+
+//     const sqlUpdate = Employee.queryUpManager();
+//     console.log(`Querying...${sqlUpdate}`);
+//     db.query(sqlUpdate, (err,result)=>{
+//         console.table(result);
+//         getMainMenu();
+//     });
+// }
 
 const update = async (field)=>{
     let responseUpdate, sqlUpdate;

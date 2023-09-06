@@ -50,7 +50,7 @@
 //        role department
         > ADD prompted response to the DB
 
-@ CHOSE add an employee
+//@ CHOSE add an employee
 //        employee’s first name
 //        last name
 //        role
