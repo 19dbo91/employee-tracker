@@ -5,6 +5,8 @@ const Role = require('./classes/Role.js')
 const { prompt } = require('inquirer');
 const db = require('../config/connection.js')
 
+const iran = ()=>{console.log("iran")};
+
 const optionsMainMenu = [
     "View All Departments",
     "Add Department",
@@ -22,6 +24,7 @@ const promptsMainMenu = [
 
 const getMainMenu = async () => {
     const userResponse = await prompt(promptsMainMenu);
+    console.log(`\n`)
     console.log(`You chose ${userResponse.nextMenu}!`);
     
     switch(userResponse.nextMenu){
@@ -30,6 +33,7 @@ const getMainMenu = async () => {
         case "View All Employees":      view(Employee.all); break;
         case "Add Department":          addDepartment();break;
         case "Add Role":                addRole();break;
+        case "Add Employee":            addEmployee();break;
         case 'quit':
         default:
             console.log("Thank you! We hope to see you soon :)");
@@ -59,22 +63,38 @@ const addDepartment = async () => {
     });
 }
 
-const addEmployee = async ()=>{
-    // query other users
-    // query roles
-    
-    // combine
 
-    const responseAdd = await prompt([
-        new ShortAnswer( 'firstName', Role.promptsTitle ),
-        new ShortAnswer( 'lastName', Role.promptsTitle ),
-        new Question( 'salary', 'number', Role.promptsSalary, ),
-        new MultiChoice ( 'manager' , Role.promptsDepartment, updatedList)
+const promisifyQuery = (query) =>{
+    return new Promise((resolve,reject) => {
+        db.query(query, (err,result) => { err
+            ? reject(err)
+            : resolve(result)
+        })
+    })
+}//cgpt-assist
+
+const addEmployee = async ()=>{
+    const [roles, otherEmployees] = await Promise.all([
+        promisifyQuery(Role.selectTitle),
+        promisifyQuery(Employee.selectManager),
     ]);
 
-    console.log(responseAdd)
+    const chooseRole = roles.map( (role) => role.title );
+    const chooseManger = otherEmployees.map( (employee) => employee.fullName );
+    console.log(chooseRole, chooseManger);
 
-    const sqlInsert = 0;
+    const responseAdd = await prompt([
+        new ShortAnswer( 'firstName', Employee.promptsFirst ),
+        new ShortAnswer( 'lastName', Employee.promptsLast ),
+        new MultiChoice( 'role', Employee.promptsSalary, chooseRole), //note: id needed, string recieved as displayed
+        new MultiChoice( 'manager', Employee.promptsDepartment, chooseManger) //note: id needed, string recieved  as displayed
+    ]);
+
+    const {firstName, lastName, role, manager} = responseAdd;
+    const roleId = chooseRole.indexOf(role);
+    const managerId = chooseManger.indexOf(manager);
+
+    const sqlInsert = Employee.queryInsert(firstName, lastName, roleId, managerId);
     console.log(`Querying...${sqlInsert}`);
     db.query(sqlInsert, (err,result)=>{
         console.table(result);
@@ -90,7 +110,7 @@ const addRole = async()=>{
             const responseAdd = await prompt([
                 new ShortAnswer( 'title', Role.promptsTitle ),
                 new Question( 'salary', 'number', Role.promptsSalary, ),
-                new MultiChoice ( 'department' , Role.promptsDepartment, updatedList)
+                new MultiChoice ( 'department' , Role.promptsDepartment, updatedList) //note: id needed, string recieved
             ]);
             
             const { title, salary } = responseAdd;

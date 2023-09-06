@@ -4,11 +4,11 @@ run npm install --save inquirer
 
 Departments
 [X] View
-[ ] Add
+[X] Add
 
 Roles
 [X] View
-[ ] Add
+[X] Add
 
 Employees
 [X] View

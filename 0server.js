@@ -54,7 +54,7 @@
 //        employee’s first name
 //        last name
 //        role
-        manager
+//        manager
         > ADD prompted response to the DB
 
 @ CHOSE update an employee role

@@ -5,6 +5,7 @@ const insertColumns = "title, salary, department_id";
 
 const Role = {
     all:            `SELECT ${selectColumns} FROM roles ${selectJoin}`,
+    selectTitle:     "SELECT title FROM roles",
     promptsTitle:   "What is the title of the role?",
     promptsSalary:  "What would be its salary?",
     promptsDepartment:  "What department will this be under?",
