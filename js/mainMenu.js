@@ -92,8 +92,8 @@ const addEmployee = async ()=>{
     ]);
 
     const {firstName, lastName, role, manager} = responseAdd;
-    const roleId = chooseRole.indexOf(role);
-    const managerId = chooseManger.indexOf(manager);
+    const roleId = chooseRole.indexOf(role)+1; //offbyOne dueTo indexVS ID
+    const managerId = chooseManger.indexOf(manager)+1; //offbyOne dueTo indexVS ID
 
     const sqlInsert = Employee.queryInsert(firstName, lastName, roleId, managerId);
     console.log(`Querying...${sqlInsert}`);
@@ -114,7 +114,7 @@ const addRole = async()=>{
             ]);
             
             const { title, salary } = responseAdd;
-            const departmentId = updatedList.indexOf(responseAdd.department)+1
+            const departmentId = updatedList.indexOf(responseAdd.department)+1; //offbyOne dueTo indexVS ID
             if(!title || !salary){
                 console.error("Error in title or salary; please try again")
                 console.log(`\n`)
@@ -144,14 +144,14 @@ const updateEmployeeRole = async() => {
     console.log(chooseRole, chooseEmployee);
 
     const responseUpdate = await prompt([
-        new MultiChoice( 'employee', Employee.promptsChangeRole, chooseEmployee), //note: id needed, string recieved  as displayed
+        new MultiChoice( 'employee', Employee.promptsEmployee, chooseEmployee), //note: id needed, string recieved  as displayed
         new MultiChoice( 'role', Role.promptsTitle, chooseRole) //note: id needed, string recieved as displayed
     ]);
 
     const { role, employee } = responseUpdate;
 
-    const roleId = chooseRole.indexOf(role)+1;
-    const employeeId = chooseEmployee.indexOf(employee)+1;
+    const roleId = chooseRole.indexOf(role)+1; //offbyOne dueTo indexVS ID
+    const employeeId = chooseEmployee.indexOf(employee)+1; //offbyOne dueTo indexVS ID
 
     console.log(employeeId, roleId );
 
@@ -163,17 +163,34 @@ const updateEmployeeRole = async() => {
         getMainMenu();
     });
 }
-// const updateEmployeeManager = async() => {
-//     let responseUpdate;
-//     console.log(responseUpdate);
 
-//     const sqlUpdate = Employee.queryUpManager();
-//     console.log(`Querying...${sqlUpdate}`);
-//     db.query(sqlUpdate, (err,result)=>{
-//         console.table(result);
-//         getMainMenu();
-//     });
-// }
+const updateEmployeeManager = async() => {
+    const [employees] = await Promise.all([
+        promisifyQuery(Employee.selectFullName),
+    ]);
+
+    const chooseEmployee = employees.map( (employee) => employee.fullName );
+    console.log(chooseEmployee);
+
+    const responseUpdate = await prompt([
+        new MultiChoice( 'employee', Employee.promptsEmployee, chooseEmployee), //note: id needed, string recieved  as displayed
+        new MultiChoice( 'manager', Employee.promptsManager, chooseEmployee) //note: id needed, string recieved as displayed
+    ]);
+
+    const { employee, manager } = responseUpdate;
+    const employeeId = chooseEmployee.indexOf(employee)+1; //offbyOne dueTo indexVS ID
+    const managerId = chooseEmployee.indexOf(manager)+1; //offbyOne dueTo indexVS ID
+
+    console.log(employeeId, managerId );
+
+
+    const sqlUpdate = Employee.queryUpManager(employeeId, managerId);
+    console.log(`Querying...${sqlUpdate}`);
+    db.query(sqlUpdate, (err,result)=>{
+        console.table(result);
+        getMainMenu();
+    });
+}
 
 const update = async (field)=>{
     let responseUpdate, sqlUpdate;

@@ -5,9 +5,10 @@ const selectJoin = "JOIN roles ON E.role_id = roles.id JOIN departments ON roles
 
 const Employee = {
     all:            `SELECT ${selectColumns} FROM employees AS E ${selectJoin};`,
-    selectFullName:  "SELECT CONCAT (first_name, ' ', last_name) AS fullName FROM employees;",
+    selectFullName: "SELECT CONCAT (first_name, ' ', last_name) AS fullName FROM employees;",
     promptsFirst:   "What is the new employee's first name?",
     promptsLast:    "What is their last name?",
+    promptsEmployee:"Whose information is being updated?" ,
     promptsManager: "Who is their manager?",
     promptsChangeRole: "Who is changing roles?",
     queryInsert:    function(firstName, lastName, roleId, managerId){
@@ -16,7 +17,9 @@ const Employee = {
     queryUpRole:    function(employeeId, roleId){
         return `UPDATE employees SET role_Id = "${roleId}" where id=${employeeId}`;
     },
-    queryUpManager: function(){},
+    queryUpManager: function(employeeId, managerId){
+        return `UPDATE employees SET manager_Id = "${managerId}" where id=${employeeId}`;
+    },
 };
 
 module.exports = Employee;
