@@ -32,9 +32,9 @@ Rename the ``.env.EXAMPLE`` to ``.env``
 Change the ``.env`` contents to match your own MySql database username and password
 
 In mysql shell, 
-    ``USE org_db;``
-    ``SOURCE db/schema.sql``
-    ``SOURCE db/seeds.sql``(optional if you wanna see use case)
+  -  ``USE org_db;``
+  -  ``SOURCE db/schema.sql``
+  -  ``SOURCE db/seeds.sql`` (optional; for dummy data to play with)
 
 ## Usage
 
@@ -42,7 +42,7 @@ In mysql shell,
 - Start with ``npm start``
 - Follow the prompts as desired
 
-- Check out this [demo video](still working on it)
+- Check out this [demo video](https://drive.google.com/file/d/133keVLozQrFgn75NG2jveycT67otv6T3/view?usp=drive_link)
 
 ## License
 
