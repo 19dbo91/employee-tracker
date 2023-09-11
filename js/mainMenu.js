@@ -72,7 +72,7 @@ const viewEmployeeByManager = async()=>{
     ]);
 
     const chooseEmployee = employees.map( (employee) => employee.fullName );
-    console.log(chooseEmployee);
+    //console.log(chooseEmployee);
 
     const responseView = await prompt([
         new MultiChoice( 'manager', Employee.promptsEmployee, chooseEmployee), //note: id needed, string recieved  as displayed
@@ -97,7 +97,7 @@ const viewEmployeeByDepartment = async() => {
     ]);
 
     const chooseDepartment = departments.map( (dept) => dept.name );
-    console.log(chooseDepartment);
+    //console.log(chooseDepartment);
 
     const responseView = await prompt([
         new MultiChoice( 'department', Department.promptsName, chooseDepartment), //note: id needed, string recieved  as displayed
@@ -142,7 +142,7 @@ const addEmployee = async ()=>{
 
     const chooseRole = roles.map( (role) => role.title );
     const chooseManger = otherEmployees.map( (employee) => employee.fullName );
-    console.log(chooseRole, chooseManger);
+    //console.log(chooseRole, chooseManger);
 
     const responseAdd = await prompt([
         new ShortAnswer( 'firstName', Employee.promptsFirst ),
@@ -202,7 +202,7 @@ const updateEmployeeRole = async() => {
 
     const chooseRole = roles.map( (role) => role.title );
     const chooseEmployee = employees.map( (employee) => employee.fullName );
-    console.log(chooseRole, chooseEmployee);
+    //console.log(chooseRole, chooseEmployee);
 
     const responseUpdate = await prompt([
         new MultiChoice( 'employee', Employee.promptsEmployee, chooseEmployee), //note: id needed, string recieved  as displayed
@@ -231,7 +231,7 @@ const updateEmployeeManager = async() => {
     ]);
 
     const chooseEmployee = employees.map( (employee) => employee.fullName );
-    console.log(chooseEmployee);
+    //console.log(chooseEmployee);
 
     const responseUpdate = await prompt([
         new MultiChoice( 'employee', Employee.promptsEmployee, chooseEmployee), //note: id needed, string recieved  as displayed
